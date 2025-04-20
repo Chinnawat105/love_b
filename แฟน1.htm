@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>I Love You</title>
+  <style>
+    body {
+      background: url('https://images.unsplash.com/photo-1529257414771-1960f09a1f4b?auto=format&fit=crop&w=1600&q=80') no-repeat center center fixed;
+      background-size: cover;
+      color: #fffafc;
+      font-family: 'Mali', cursive;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+      position: relative;
+      text-shadow: 1px 1px 3px #000;
+    }
+
+    .message {
+      font-size: 1.8rem;
+      text-align: center;
+      max-width: 600px;
+      white-space: pre-wrap;
+      margin-bottom: 20px;
+      z-index: 1;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 24px;
+      border-radius: 20px;
+      backdrop-filter: blur(6px);
+      border: 2px dashed #ffdce0;
+      box-shadow: 0 0 20px rgba(255, 180, 200, 0.4);
+      transition: color 0.5s ease;
+    }
+
+    .response {
+      font-size: 1.4rem;
+      margin-top: 10px;
+      opacity: 0;
+      transition: opacity 0.5s ease-in-out;
+      z-index: 1;
+      color: #fff;
+    }
+
+    .response.show {
+      opacity: 1;
+    }
+
+    .emoji {
+      position: absolute;
+      font-size: 2rem;
+      animation: floatUp 5s linear infinite;
+      opacity: 0.8;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    @keyframes floatUp {
+      0% { transform: translateY(0) scale(1); opacity: 1; }
+      100% { transform: translateY(-100vh) scale(1.5); opacity: 0; }
+    }
+
+    button {
+      padding: 12px 28px;
+      font-size: 1.2rem;
+      background-color: #ff6ea1;
+      border: none;
+      border-radius: 50px;
+      color: white;
+      cursor: pointer;
+      transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
+      z-index: 1;
+      margin: 10px;
+      box-shadow: 0 0 10px rgba(255, 110, 161, 0.5);
+    }
+
+    button:hover {
+      transform: scale(1.1);
+      background-color: #ff89b2;
+      box-shadow: 0 0 20px rgba(255, 137, 178, 0.7);
+    }
+
+    button:active {
+      transform: scale(0.95);
+    }
+
+    .shooting-star {
+      position: absolute;
+      width: 80px;
+      height: 2px;
+      background: linear-gradient(120deg, #fff, #ffb6c1, transparent);
+      animation: shooting 1.5s ease-out forwards;
+      transform: rotate(45deg);
+      opacity: 0.8;
+      z-index: 0;
+    }
+
+    @keyframes shooting {
+      0% { transform: translateX(0) translateY(0) rotate(45deg); opacity: 1; }
+      100% { transform: translateX(-200px) translateY(200px) rotate(45deg); opacity: 0; }
+    }
+
+    #heart-counter {
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      background: rgba(255, 110, 161, 0.7);
+      padding: 10px 20px;
+      border-radius: 15px;
+      font-size: 1.2rem;
+      z-index: 10;
+      box-shadow: 0 0 15px rgba(255, 110, 161, 0.5);
+    }
+
+    .heart-pop {
+      animation: heartPop 0.5s ease-out;
+    }
+
+    @keyframes heartPop {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.3); }
+      100% { transform: scale(1); }
+    }
+
+    #love-timer {
+      position: absolute;
+      top: 10px;
+      left: 20px;
+      background: rgba(255, 110, 161, 0.7);
+      padding: 10px 20px;
+      border-radius: 15px;
+      font-size: 1.2rem;
+      z-index: 10;
+      box-shadow: 0 0 15px rgba(255, 110, 161, 0.5);
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Mali&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="message" id="message"></div>
+  <button onclick="sendLoveBack(event)">ข้อความลัก 💌</button>
+  <div class="response" id="response"></div>
+  <div id="heart-counter">💖 ระดับความหวาน: 0</div>
+  <div id="love-timer">🕰️ รักกันมาแล้ว: <span id="timer"></span></div>
+
+  <audio id="heart-sound" src="https://www.myinstants.com/media/sounds/heartbeat.mp3"></audio>
+  <audio id="bg-music" src="music-VEED.mp3" loop hidden></audio>
+
+  <script>
+    const msg = `ท่านผู้โชคดี 💌\n\nขอแจ้งว่า....\n\nin love airline ❤️\n\nสวัสดีค่ะท่านผู้โดยสาร สายการบินแห่งความรัก ขณะนี้ท่านได้อยู่ในหลุมรักที่ดิชั้นขุดไว้ เราขอแจ้งว่าแฟนต้องคิดกับเราไปตลอดชีวิต โดยทางเราจะดูแลเอาใจใส่และรักแฟนจนแก่ชรา 💕`;
+
+    const responseTexts = [
+      "หวัดดีฮะ แฟนคนเก่งของหนู",
+      "😳💓",
+      "ขอบคุณที่ปัดขวาในวันนั้น ❤️❤️",
+      "ที่ทำให้เราได้รักกันนะคะ 🥰",
+      "ขอบคุณที่เข้ามาในชีวิตหนูน้าาาาาาา 🌟",
+      "ขอบคุณที่ทำให้รู้ว่าความรักที่ดีมันเป็นแบบไหน 😚",
+      "ขอบคุณรักหนู อ้วงๆคนนี้น้าาาา 💖",
+      "ขอบคุณที่ซับพอร์ตทั้งความรู้สึก ความรัก กิน เที่ยว 💕",
+      "ขอบคุณในทุกสิ่งที่มอบให้นะคะ 💕",
+      "วันใดที่พี่งอแง พี่จะขอให้รักพี่เหมือนเดิม (รักฮะแต่ขอด่าก่อน 555) 💓",
+      "งั้นหนูก็คงบอกพี่ว่าถ้าวันไหนหนูทำตัวไม่น่ารักช่วยรักหนูด้วยนะะ 🥺💖",
+      "รู้ไหมเจ้าความรัก เธอมันโคตรจะ VIP 💕",
+      "รู้ไหมเธอหน่ะ ไม่มีใครมาแทนได้ 💖",
+      "หนูรักพี่นะคะ 🥰",
+      "พี่อยู่ไหน ข้างซ้ายของพี่จะมีหนู 💓"
+      
+
+    ];
+
+    const emojis = ["❤️", "🌸", "💐", "🌹", "✨", "💖"];
+    const container = document.getElementById("message");
+    const response = document.getElementById("response");
+    const heartSound = document.getElementById("heart-sound");
+    const bgMusic = document.getElementById("bg-music");
+    const heartCounter = document.getElementById("heart-counter");
+    const timerDisplay = document.getElementById("timer");
+    let i = 0;
+    let clickCount = 0;
+    let totalHearts = 0;
+
+    function typeWriter() {
+      if (i < msg.length) {
+        container.innerHTML += msg.charAt(i);
+        i++;
+        setTimeout(typeWriter, 45);
+      }
+    }
+    typeWriter();
+
+    setInterval(() => {
+      const emoji = document.createElement("div");
+      emoji.classList.add("emoji");
+      emoji.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+      emoji.style.left = Math.random() * 100 + "vw";
+      emoji.style.fontSize = (Math.random() * 20 + 20) + "px";
+      emoji.style.animationDuration = (Math.random() * 3 + 4) + "s";
+      document.body.appendChild(emoji);
+      setTimeout(() => emoji.remove(), 5000);
+    }, 600);
+
+    document.addEventListener('click', function playOnce() {
+      bgMusic.play().catch(() => {});
+      document.removeEventListener('click', playOnce);
+    });
+
+    function updateHeartCounter() {
+      totalHearts += Math.floor(Math.random() * 5) + 1;
+      heartCounter.textContent = `💖 ระดับความหวาน: ${totalHearts}`;
+      heartCounter.classList.add("heart-pop");
+      setTimeout(() => heartCounter.classList.remove("heart-pop"), 500);
+    }
+
+    function sendLoveBack(event) {
+      const text = responseTexts[Math.floor(Math.random() * responseTexts.length)];
+      clickCount++;
+      response.innerText = `${text} 💞 `;
+      response.classList.add("show");
+      heartSound.currentTime = 0;
+      heartSound.play();
+      updateHeartCounter();
+      bloomFlower();
+    }
+
+    function bloomFlower() {
+      const flower = document.createElement("div");
+      flower.innerText = "🌸";
+      flower.style.position = "absolute";
+      flower.style.left = `${Math.random() * 100}vw`;
+      flower.style.top = `${Math.random() * 100}vh`;
+      flower.style.fontSize = `${Math.random() * 20 + 20}px`;
+      flower.style.opacity = 0;
+      flower.style.transition = "all 2s ease-out";
+      document.body.appendChild(flower);
+      setTimeout(() => {
+        flower.style.opacity = 1;
+        flower.style.transform = "scale(2)";
+        flower.style.top = `${parseFloat(flower.style.top) - 50}px`;
+      }, 100);
+      setTimeout(() => flower.remove(), 3000);
+    }
+
+    function createShootingStar() {
+      const star = document.createElement("div");
+      star.classList.add("shooting-star");
+      star.style.top = Math.random() * window.innerHeight * 0.6 + "px";
+      star.style.left = Math.random() * window.innerWidth + "px";
+      document.body.appendChild(star);
+      setTimeout(() => star.remove(), 2000);
+    }
+    setInterval(createShootingStar, 5000);
+
+    // นับเวลารัก
+    const startDate = new Date("2025-01-25T00:00:00"); // ปรับวันครบรอบที่นี่
+    function updateTimer() {
+      const now = new Date();
+      const diff = now - startDate;
+      const years = Math.floor(diff / (1000 * 60 * 60 * 24 * 365));
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((diff / (1000 * 60)) % 60);
+      const seconds = Math.floor((diff / 1000) % 60);
+      timerDisplay.textContent = `${years}ปี ${days} วัน ${hours} ชม. ${minutes} นาที ${seconds} วินาที`;
+    }
+    setInterval(updateTimer, 1000);
+    updateTimer();
+  </script>
+</body>
+</html>
