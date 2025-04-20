@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>I Love You</title>
+  <style>
+    body {
+      background: url('https://images.unsplash.com/photo-1529257414771-1960f09a1f4b?auto=format&fit=crop&w=1600&q=80') no-repeat center center fixed;
+      background-size: cover;
+      color: #fffafc;
+      font-family: 'Mali', cursive;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+      position: relative;
+      text-shadow: 1px 1px 3px #000;
+      margin: 0;
+      padding: 0;
+    }
+
+    .content-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+      width: 100%;
+      max-width: 800px;
+    }
+
+    .message {
+      font-size: 1.8rem;
+      text-align: center;
+      max-width: 600px;
+      white-space: pre-wrap;
+      margin-bottom: 20px;
+      z-index: 1;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 24px;
+      border-radius: 20px;
+      backdrop-filter: blur(6px);
+      border: 2px dashed #ffdce0;
+      box-shadow: 0 0 20px rgba(255, 180, 200, 0.4);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .message:hover {
+      transform: scale(1.02);
+      box-shadow: 0 0 30px rgba(255, 180, 200, 0.7);
+    }
+
+    .response {
+      font-size: 1.4rem;
+      color: #ffebf0;
+      margin-top: 10px;
+      opacity: 0;
+      transition: opacity 0.5s ease-in-out;
+      text-align: center;
+      padding: 15px;
+      background: rgba(255, 180, 200, 0.2);
+      border-radius: 15px;
+      max-width: 80%;
+    }
+
+    .response.show {
+      opacity: 1;
+      animation: pulse 1.5s infinite;
+    }
+
+    .emoji {
+      position: absolute;
+      font-size: 2rem;
+      animation: floatUp 5s linear infinite;
+      opacity: 0.8;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    @keyframes floatUp {
+      0% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-100vh) scale(1.5);
+        opacity: 0;
+      }
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.03); }
+      100% { transform: scale(1); }
+    }
+
+    .buttons-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 20px;
+      z-index: 1;
+    }
+
+    button {
+      padding: 12px 28px;
+      font-size: 1.2rem;
+      background-color: #ff6ea1;
+      border: none;
+      border-radius: 50px;
+      color: white;
+      cursor: pointer;
+      transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
+      box-shadow: 0 0 10px rgba(255, 110, 161, 0.5);
+    }
+
+    button:hover {
+      transform: scale(1.1);
+      background-color: #ff89b2;
+      box-shadow: 0 0 20px rgba(255, 137, 178, 0.7);
+    }
+
+    button:active {
+      transform: scale(0.95);
+    }
+
+    #special-button {
+      background-color: #ff2d78;
+    }
+
+    #special-button:hover {
+      background-color: #ff5292;
+    }
+
+    .photo-gallery {
+      display: none;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 20px;
+      max-width: 80%;
+    }
+
+    .photo-placeholder {
+      width: 120px;
+      height: 120px;
+      background-color: rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 2.5rem;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+      overflow: hidden;
+    }
+
+    .photo-placeholder:hover {
+      transform: scale(1.1);
+    }
+
+    .memory-text {
+      font-size: 0.9rem;
+      text-align: center;
+      padding: 5px;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.8);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background-color: rgba(255, 255, 255, 0.9);
+      color: #333;
+      padding: 30px;
+      border-radius: 15px;
+      max-width: 80%;
+      text-align: center;
+      position: relative;
+    }
+
+    .close-modal {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 1.8rem;
+      cursor: pointer;
+      color: #ff6ea1;
+    }
+
+    .calendar {
+      display: none;
+      background-color: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      padding: 20px;
+      margin-top: 20px;
+      max-width: 90%;
+    }
+
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+      text-align: center;
+    }
+
+    .calendar-day {
+      padding: 10px;
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .calendar-day:hover {
+      background-color: rgba(255, 110, 161, 0.5);
+    }
+
+    .calendar-day.special {
+      background-color: rgba(255, 110, 161, 0.7);
+    }
+
+    .heart-counter {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background-color: rgba(255, 110, 161, 0.7);
+      padding: 10px 15px;
+      border-radius: 20px;
+      font-size: 1.2rem;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    #confetti-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .music-controls {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      display: flex;
+      align-items: center;
+      background-color: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(5px);
+      padding: 10px;
+      border-radius: 30px;
+      z-index: 10;
+    }
+
+    .music-controls button {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 0;
+      margin: 0 5px;
+      font-size: 1.2rem;
+    }
+
+    .music-title {
+      margin-left: 10px;
+      font-size: 0.9rem;
+      max-width: 150px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Mali&display=swap" rel="stylesheet">
+</head>
+
+<body>
+  <canvas id="confetti-canvas"></canvas>
+  
+  <div class="heart-counter">
+    <span id="heart-icon">❤️</span>
+    <span id="heart-count">0</span>
+  </div>
+
+  <div class="content-wrapper">
+    <div class="message" id="message"></div>
+    
+    <div class="buttons-container">
+      <button onclick="sendLoveBack()">ส่งรักกลับ 💌</button>
+      <button onclick="togglePhotoGallery()">อัลบั้มความทรงจำ 📷</button>
+      <button onclick="toggleCalendar()">ปฏิทินแห่งรัก 📅</button>
+      <button onclick="playLoveGame()" id="special-button">เกมหัวใจ ❤️</button>
+    </div>
+    
+    <div class="response" id="response"></div>
+
+    <div class="photo-gallery" id="photo-gallery">
+      <div class="photo-placeholder" onclick="showMemory(1)">
+        <img src="/api/placeholder/120/120" alt="ความทรงจำ 1">
+        <div class="memory-text">วันแรกที่เจอกัน</div>
+      </div>
+      <div class="photo-placeholder" onclick="showMemory(2)">
+        <img src="/api/placeholder/120/120" alt="ความทรงจำ 2">
+        <div class="memory-text">วันเดทแรก</div>
+      </div>
+      <div class="photo-placeholder" onclick="showMemory(3)">
+        <img src="/api/placeholder/120/120" alt="ความทรงจำ 3">
+        <div class="memory-text">ทริปแรกด้วยกัน</div>
+      </div>
+      <div class="photo-placeholder" onclick="showMemory(4)">
+        <img src="/api/placeholder/120/120" alt="ความทรงจำ 4">
+        <div class="memory-text">วันครบรอบเรา</div>
+      </div>
+      <div class="photo-placeholder" onclick="showMemory(5)">
+        <img src="/api/placeholder/120/120" alt="ความทรงจำ 5">
+        <div class="memory-text">โมเมนต์พิเศษ</div>
+      </div>
+      <div class="photo-placeholder" onclick="showMemory(6)">
+        <img src="/api/placeholder/120/120" alt="ความทรงจำ 6">
+        <div class="memory-text">เติมความทรงจำ</div>
+      </div>
+    </div>
+
+    <div class="calendar" id="calendar">
+      <div class="calendar-header">
+        <span id="calendar-month">เมษายน 2025</span>
+        <div>
+          <button onclick="changeMonth(-1)">◀</button>
+          <button onclick="changeMonth(1)">▶</button>
+        </div>
+      </div>
+      <div class="calendar-grid" id="calendar-grid">
+        <!-- จะถูกสร้างโดย JavaScript -->
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="memory-modal">
+    <div class="modal-content">
+      <span class="close-modal" onclick="closeModal()">&times;</span>
+      <h2 id="memory-title">ความทรงจำ</h2>
+      <img src="/api/placeholder/400/320" alt="ภาพความทรงจำ" id="memory-image">
+      <p id="memory-description">รายละเอียดความทรงจำ</p>
+    </div>
+  </div>
+
+  <div class="modal" id="game-modal">
+    <div class="modal-content">
+      <span class="close-modal" onclick="closeModal()">&times;</span>
+      <h2>เกมหัวใจ</h2>
+      <p>คลิกที่หัวใจให้เร็วที่สุดเพื่อสะสมคะแนนความรัก!</p>
+      <div id="game-area" style="width:300px;height:300px;position:relative;background:rgba(255,255,255,0.1);border-radius:15px;margin:0 auto;">
+        <div id="game-heart" style="position:absolute;font-size:2rem;cursor:pointer;">❤️</div>
+      </div>
+      <p>คะแนนของคุณ: <span id="game-score">0</span></p>
+      <button onclick="startLoveGame()">เริ่มเกม</button>
+    </div>
+  </div>
+
+  <div class="music-controls">
+    <button id="play-pause">▶</button>
+    <button id="prev-song">◀</button>
+    <button id="next-song">▶</button>
+    <div class="music-title" id="song-title">เพลงความรัก</div>
+  </div>
+
+  <audio id="bgMusic" loop>
+    <source src="music-VEED.mp3" type="audio/mp3">
+  </audio>
+
+  <script>
+    // ข้อความหลัก
+    const msg = `ถึงเธอที่แสนพิเศษ 💌
+    
+
+แค่จะบอกว่า...
+
+I LOVE YOU BABE ❤️
+
+"โบว์วี่คือความสุขในทุกวันของเค้า ดีใจที่ได้เป็นแฟนกัน เค้ารักโบว์วี่มากเลย อยากอยู่ข้างๆ ดูแลและคอยเป็นกำลังใจให้โบว์วี่ตลอดไป 💕"`;
+
+    // ข้อความตอบกลับที่สุ่มได้
+    const responseTexts = [
+      "งื้อออ~ เค้าก็รักเบบี๋เหมือนกันน้า 💕",
+      "โอ๊ย ใจละลายย~ 😳💓",
+      "รักที่สู๊ดดด! สองเท่าเลย! ❤️❤️",
+      "ขอบคุณที่คอยเป็นกำลังใจให้เค้านะ 🥰",
+      "เราจะอยู่ข้างกันเสมอไม่ว่าจะวันไหน ๆ 🌟",
+      "ฮือออ ใจมันตุ๊บตุ๊บๆเลยตอนนี้ 😚",
+      "อยากกอดแน่นๆเลยตอนนี้ 🤗💗",
+      "คนนี้แหละที่หัวใจเค้าเลือก 💘",
+      "นับวันรักยิ่งเพิ่มขึ้นทุกวันเลย 💓",
+      "เอาใจไปตั้งแต่เมื่อไหร่เนี่ย 💝"
+    ];
+
+    // อีโมจิที่ใช้
+    const emojis = ["❤️", "🌸", "💐", "🌹", "✨", "💖", "💕", "💓", "💗", "💘", "🥰", "😘", "🤗"];
+
+    // ความทรงจำ
+    const memories = [
+      {
+        title: "วันแรกที่เจอกัน",
+        description: "วันที่เราเจอกันครั้งแรกที่ร้านกาแฟ เธอเดินเข้ามาและยิ้มให้ ทำให้หัวใจเต้นแรงขึ้นทันที"
+      },
+      {
+        title: "วันเดทแรก",
+        description: "เดทแรกที่เราไปดูหนังด้วยกัน แล้วไปกินไอศกรีมต่อ ยังจำได้ว่าเธอชอบรสชาเขียว"
+      },
+      {
+        title: "ทริปแรกด้วยกัน",
+        description: "ทริปทะเลครั้งแรกของเรา เดินจับมือชมพระอาทิตย์ตกด้วยกัน ความทรงจำที่มีค่าเหลือเกิน"
+      },
+      {
+        title: "วันครบรอบเรา",
+        description: "ฉลองครบรอบแรกของเราที่ร้านอาหารสุดโรแมนติก เทียนไข ดอกกุหลาบ และรอยยิ้มของเธอ"
+      },
+      {
+        title: "โมเมนต์พิเศษ",
+        description: "โมเมนต์เล็กๆ แต่แสนพิเศษ เมื่อเราหัวเราะด้วยกันจนน้ำตาไหล เพราะเรื่องตลกเล็กๆ น้อยๆ"
+      },
+      {
+        title: "เพิ่มความทรงจำใหม่",
+        description: "คลิกเพื่อเพิ่มภาพและความทรงจำใหม่ของเรา อยากสร้างความทรงจำดีๆ กับเธอไปอีกนานเท่านาน"
+      }
+    ];
+
+    // เพลงรักที่มี
+    const songs = [
+      { title: "Love Story", source: "music-VEED.mp3" },
+      { title: "สิ่งของ - Klear", source: "music-VEED.mp3" },
+      { title: "ฝันถึงแฟนเก่า - Pop Pongkool", source: "music-VEED.mp3" },
+      { title: "อยู่ตรงนี้เสมอ - 25 Hours", source: "music-VEED.mp3" }
+    ];
+
+    // ตัวแปรสำหรับเกมและคะแนน
+    let heartCount = 0;
+    let gameScore = 0;
+    let gameInterval;
+    let currentSong = 0;
+    let isPlaying = false;
+
+    // DOM Elements
+    const container = document.getElementById("message");
+    const audio = document.getElementById("bgMusic");
+    const playPauseBtn = document.getElementById("play-pause");
+    const songTitleElem = document.getElementById("song-title");
+
+    // ตั้งค่าเริ่มต้น
+    let i = 0;
+    songTitleElem.textContent = songs[currentSong].title;
+
+    // Type writer effect
+    function typeWriter() {
+      if (i < msg.length) {
+        container.innerHTML += msg.charAt(i);
+        i++;
+        setTimeout(typeWriter, 45);
+      }
+    }
+
+    // เริ่มพิมพ์ข้อความ
+    typeWriter();
+
+    // สร้างอีโมจิลอย
+    setInterval(() => {
+      const emoji = document.createElement("div");
+      emoji.classList.add("emoji");
+      emoji.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+      emoji.style.left = Math.random() * 100 + "vw";
+      emoji.style.fontSize = (Math.random() * 20 + 20) + "px";
+      emoji.style.animationDuration = (Math.random() * 3 + 4) + "s";
+      document.body.appendChild(emoji);
+      setTimeout(() => emoji.remove(), 5000);
+    }, 600);
+
+    // ฟังก์ชันส่งรักกลับ
+    function sendLoveBack() {
+      const response = document.getElementById("response");
+      const text = responseTexts[Math.floor(Math.random() * responseTexts.length)];
+      response.innerText = text;
+      response.classList.add("show");
+      
+      // เพิ่มหัวใจ
+      increaseHeartCount(1);
+      
+      // เล่นเอฟเฟกต์ confetti
+      launchConfetti();
+    }
+
+    // เพิ่มตัวนับหัวใจ
+    function increaseHeartCount(amount) {
+      heartCount += amount;
+      document.getElementById("heart-count").textContent = heartCount;
+      document.getElementById("heart-icon").classList.add("pulse");
+      setTimeout(() => {
+        document.getElementById("heart-icon").classList.remove("pulse");
+      }, 500);
+    }
+
+    // สลับแสดง/ซ่อน อัลบั้มรูป
+    function togglePhotoGallery() {
+      const gallery = document.getElementById("photo-gallery");
+      const calendar = document.getElementById("calendar");
+      
+      if (gallery.style.display === "flex") {
+        gallery.style.display = "none";
+      } else {
+        gallery.style.display = "flex";
+        calendar.style.display = "none";
+      }
+    }
+
+    // สลับแสดง/ซ่อน ปฏิทิน
+    function toggleCalendar() {
+      const gallery = document.getElementById("photo-gallery");
+      const calendar = document.getElementById("calendar");
+      
+      if (calendar.style.display === "block") {
+        calendar.style.display = "none";
+      } else {
+        calendar.style.display = "block";
+        gallery.style.display = "none";
+        renderCalendar();
+      }
+    }
+
+    // แสดงความทรงจำ
+    function showMemory(index) {
+      const memory = memories[index - 1];
+      const modal = document.getElementById("memory-modal");
+      
+      document.getElementById("memory-title").textContent = memory.title;
+      document.getElementById("memory-description").textContent = memory.description;
+      
+      modal.style.display = "flex";
+    }
+
+    // ปิด Modal
+    function closeModal() {
+      document.getElementById("memory-modal").style.display = "none";
+      document.getElementById("game-modal").style.display = "none";
+    }
+
+    // สร้างปฏิทิน
+    function renderCalendar() {
+      const calendarGrid = document.getElementById("calendar-grid");
+      calendarGrid.innerHTML = "";
+      
+      // สร้างวันที่ในปฏิทิน
+      const daysInMonth = 30; // สมมติเป็นเดือนเมษายน
+      
+      // สร้างชื่อวัน
+      const dayNames = ["อา", "จ", "อ", "พ", "พฤ", "ศ", "ส"];
+      dayNames.forEach(day => {
+        const dayElem = document.createElement("div");
+        dayElem.textContent = day;
+        dayElem.style.fontWeight = "bold";
+        calendarGrid.appendChild(dayElem);
+      });
+      
+      // เว้นวันก่อนวันที่ 1 (สมมติว่าวันที่ 1 ตรงกับวันพุธ)
+      for (let i = 0; i < 3; i++) {
+        const emptyDay = document.createElement("div");
+        calendarGrid.appendChild(emptyDay);
+      }
+      
+      // สร้างวันที่
+      for (let i = 1; i <= daysInMonth; i++) {
+        const dayElem = document.createElement("div");
+        dayElem.textContent = i;
+        dayElem.classList.add("calendar-day");
+        
+        // สมมติวันพิเศษ
+        if (i === 7 || i === 14 || i === 19) {
+          dayElem.classList.add("special");
+          dayElem.setAttribute("data-event", i === 7 ? "วันเดทแรก" : i === 14 ? "วันครบรอบ" : "วันนี้");
+          
+          // เพิ่ม event listener
+          dayElem.addEventListener("click", function() {
+            alert("วันพิเศษ: " + this.getAttribute("data-event"));
+          });
+        }
+        
+        calendarGrid.appendChild(dayElem);
+      }
+    }
+
+    // เปลี่ยนเดือนในปฏิทิน
+    function changeMonth(direction) {
+      // ฟังก์ชันนี้จะพัฒนาต่อในอนาคต
+      alert("ฟีเจอร์นี้กำลังพัฒนา");
+    }
+
+    // แสดงเกมหัวใจ
+    function playLoveGame() {
+      const gameModal = document.getElementById("game-modal");
+      gameModal.style.display = "flex";
+    }
+
+    // เริ่มเกม
+    function startLoveGame() {
+      gameScore = 0;
+      document.getElementById("game-score").textContent = gameScore;
+      
+      if (gameInterval) clearInterval(gameInterval);
+      
+      const gameHeart = document.getElementById("game-heart");
+      const gameArea = document.getElementById("game-area");
+      
+      // ตั้งค่าตำแหน่งหัวใจ
+      function setRandomPosition() {
+        const maxX = gameArea.clientWidth - 30;
+        const maxY = gameArea.clientHeight - 30;
+        
+        gameHeart.style.left = Math.floor(Math.random() * maxX) + "px";
+        gameHeart.style.top = Math.floor(Math.random() * maxY) + "px";
+      }
+      
+      // เพิ่ม event listener
+      gameHeart.onclick = function() {
+        gameScore++;
+        document.getElementById("game-score").textContent = gameScore;
+        setRandomPosition();
+        
+        // เพิ่มจำนวนหัวใจในตัวนับด้วย
+        increaseHeartCount(1);
+      };
+      
+      // เริ่มเกม
+      setRandomPosition();
+      gameInterval = setInterval(setRandomPosition, 1000);
+    }
+
+    // การจัดการเพลง
+    playPauseBtn.addEventListener("click", function() {
+      if (isPlaying) {
+        audio.pause();
+        playPauseBtn.textContent = "▶";
+      } else {
+        audio.play();
+        playPauseBtn.textContent = "⏸";
+      }
+      isPlaying = !isPlaying;
+    });
+
+    document.getElementById("next-song").addEventListener("click", function() {
+      currentSong = (currentSong + 1) % songs.length;
+      changeSong();
+    });
+
+    document.getElementById("prev-song").addEventListener("click", function() {
+      currentSong = (currentSong - 1 + songs.length) % songs.length;
+      changeSong();
+    });
+
+    function changeSong() {
+      audio.src = songs[currentSong].source;
+      songTitleElem.textContent = songs[currentSong].title;
+      
+      if (isPlaying) {
+        audio.play();
+      }
+    }
+
+    // Confetti Effect
+    function launchConfetti() {
+      const canvas = document.getElementById("confetti-canvas");
+      const ctx = canvas.getContext("2d");
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      
+      const confettiCount = 100;
+      const confettiColors = ["#ff71a6", "#ff86b3", "#ff9cc0", "#ffb3cd", "#ffc9da"];
+      const confetti = [];
+      
+      for (let i = 0; i < confettiCount; i++) {
+        confetti.push({
+          x: Math.random() * canvas.width,
+          y: -Math.random() * canvas.height,
+          size: Math.random() * 10 + 5,
+          color: confettiColors[Math.floor(Math.random() * confettiColors.length)],
+          speed: Math.random() * 3 + 2,
+          angle: Math.random() * 6.28,
+          spin: Math.random() * 0.2 - 0.1
+        });
+      }
+      
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width )}}

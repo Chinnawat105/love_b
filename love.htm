@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>I Love You</title>
+  <style>
+    body {
+      background: url('https://images.unsplash.com/photo-1529257414771-1960f09a1f4b?auto=format&fit=crop&w=1600&q=80') no-repeat center center fixed;
+      background-size: cover;
+      color: #fffafc;
+      font-family: 'Mali', cursive;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+      position: relative;
+      text-shadow: 1px 1px 3px #000;
+    }
+
+    .message {
+      font-size: 1.8rem;
+      text-align: center;
+      max-width: 600px;
+      white-space: pre-wrap;
+      margin-bottom: 20px;
+      z-index: 1;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 24px;
+      border-radius: 20px;
+      backdrop-filter: blur(6px);
+      border: 2px dashed #ffdce0;
+      box-shadow: 0 0 20px rgba(255, 180, 200, 0.4);
+    }
+
+    .response {
+      font-size: 1.4rem;
+      color: #ffebf0;
+      margin-top: 10px;
+      opacity: 0;
+      transition: opacity 0.5s ease-in-out;
+    }
+
+    .response.show {
+      opacity: 1;
+    }
+
+    .emoji {
+      position: absolute;
+      font-size: 2rem;
+      animation: floatUp 5s linear infinite;
+      opacity: 0.8;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    @keyframes floatUp {
+      0% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-100vh) scale(1.5);
+        opacity: 0;
+      }
+    }
+
+    button {
+      padding: 12px 28px;
+      font-size: 1.2rem;
+      background-color: #ff6ea1;
+      border: none;
+      border-radius: 50px;
+      color: white;
+      cursor: pointer;
+      transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
+      z-index: 1;
+      margin-top: 10px;
+      box-shadow: 0 0 10px rgba(255, 110, 161, 0.5);
+    }
+
+    button:hover {
+      transform: scale(1.1);
+      background-color: #ff89b2;
+      box-shadow: 0 0 20px rgba(255, 137, 178, 0.7);
+    }
+
+    button:active {
+      transform: scale(0.95);
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Mali&display=swap" rel="stylesheet">
+</head>
+
+<body>
+  
+  <div class="message" id="message"></div>
+  <br>
+  <button onclick="sendLoveBack()">ส่งรักกลับ 💌</button>
+  
+  <div class="response" id="response">
+    <br>
+    
+  </div>
+  <audio controls autoplay loop>
+    <source src ="music-VEED.mp3">
+  <script>
+    const msg = `ถึงเธอที่แสนพิเศษ 💌
+    
+
+แค่จะบอกว่า...
+
+I LOVE YOU BABE ❤️
+
+"โบว์วี่คือความสุขในทุกวันของเค้า ดีใจที่ได้เป็นแฟนกัน เค้ารักโบว์วี่มากเลย อยากอยู่ข้างๆ ดูแลและคอยเป็นกำลังใจให้โบว์วี่ตลอดไป 💕"`;
+
+    const responseTexts = [
+      "งื้อออ~ เค้าก็รักเบบี๋เหมือนกันน้า 💕",
+      "โอ๊ย ใจละลายย~ 😳💓",
+      "รักที่สู๊ดดด! สองเท่าเลย! ❤️❤️",
+      "ขอบคุณที่คอยเป็นกำลังใจให้เค้านะ 🥰",
+      "เราจะอยู่ข้างกันเสมอไม่ว่าจะวันไหน ๆ 🌟",
+      "ฮือออ ใจมันตุ๊บตุ๊บๆเลยตอนนี้ 😚"
+    ];
+
+    const emojis = ["❤️", "🌸", "💐", "🌹", "✨", "💖"];
+
+    const container = document.getElementById("message");
+    let i = 0;
+
+    function typeWriter() {
+      if (i < msg.length) {
+        container.innerHTML += msg.charAt(i);
+        i++;
+        setTimeout(typeWriter, 45);
+      }
+    }
+
+    typeWriter();
+
+    setInterval(() => {
+      const emoji = document.createElement("div");
+      emoji.classList.add("emoji");
+      emoji.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+      emoji.style.left = Math.random() * 100 + "vw";
+      emoji.style.fontSize = (Math.random() * 20 + 20) + "px";
+      emoji.style.animationDuration = (Math.random() * 3 + 4) + "s";
+      document.body.appendChild(emoji);
+      setTimeout(() => emoji.remove(), 5000);
+    }, 600);
+
+    function sendLoveBack() {
+      const response = document.getElementById("response");
+      const text = responseTexts[Math.floor(Math.random() * responseTexts.length)];
+      response.innerText = text;
+      response.classList.add("show");
+    }
+  </script>
+</body>
+</html>
